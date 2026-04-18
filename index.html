@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+    <title>AI Code Reviewer</title>
+    <style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f2f5;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 900px;
+        margin: 40px auto;
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    textarea {
+        width: 100%;
+        padding: 12px;
+        font-family: monospace;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        resize: vertical;
+    }
+
+    button {
+        display: block;
+        margin: 20px auto;
+        padding: 12px 25px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+    .section {
+        margin-top: 20px;
+    }
+
+    .section h3 {
+        margin-bottom: 5px;
+        color: #444;
+    }
+
+    pre {
+        background: #f8f9fa;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        white-space: pre-wrap;
+    }
+</style>
+</head>
+<body>
+
+   <div class="container">
+
+    <h2>AI Code Reviewer</h2>
+
+    <textarea id="codeInput" rows="12" placeholder="Paste your code here..."></textarea>
+
+    <button id="reviewBtn" onclick="reviewCode()">Review Code</button>
+
+    <div class="section">
+        <h3>Bugs</h3>
+        <pre id="bugs"></pre>
+    </div>
+
+    <div class="section">
+        <h3>Improvements</h3>
+        <pre id="improvements"></pre>
+    </div>
+
+    <div class="section">
+        <h3>Performance</h3>
+        <pre id="performance"></pre>
+    </div>
+
+    <div class="section">
+    <h3>Refactored Code</h3>
+
+    <button onclick="copyCode()">Copy Code</button>
+
+    <pre id="refactored"></pre>
+</div>
+
+</div>
+    <script>
+async function reviewCode() {
+    const code = document.getElementById("codeInput").value;
+    const button = document.getElementById("reviewBtn");
+
+    // 🔥 Start loading
+    button.innerText = "Reviewing...";
+    button.disabled = true;
+
+    try {
+        const response = await fetch("/review", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ code })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            alert(data.detail);
+            return;
+        }
+
+        document.getElementById("bugs").innerText = data.bugs;
+        document.getElementById("improvements").innerText = data.improvements;
+        document.getElementById("performance").innerText = data.performance;
+        document.getElementById("refactored").innerText = data.refactored_code;
+
+    } catch (error) {
+        alert("Something went wrong.");
+    } finally {
+        button.innerText = "Review Code";
+        button.disabled = false;
+    }
+}
+
+function copyCode() {
+    const code = document.getElementById("refactored").innerText;
+
+    navigator.clipboard.writeText(code)
+        .then(() => {
+            alert("Code copied to clipboard!");
+        })
+        .catch(() => {
+            alert("Failed to copy.");
+        });
+}
+</script>
+
+</body>
+</html>
