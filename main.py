@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import google.generativeai as genai
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 
 # 🔑 Add your API key here
 import os
@@ -43,6 +44,10 @@ except Exception as e:
 # Request body structure
 class CodeInput(BaseModel):
     code: str
+
+@app.get("/")
+def serve_ui():
+    return FileResponse("index.html")
 
 @app.post("/decide")
 def decide(input: CodeInput):
